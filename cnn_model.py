@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import torch
 
 '''
@@ -5,8 +7,9 @@ CODE 설명
 cnn 모델을 class형으로 만듬
 '''
 
-
 batch_size = 2
+
+
 class NkModel(torch.nn.Module):
 
     def __init__(self):
@@ -18,10 +21,7 @@ class NkModel(torch.nn.Module):
         #이 부분을 고쳐 줘야 한다.
         self.conv3 = torch.nn.Linear(18432,2)
 
-
-
     def forward(self, x):
-
 
         x = self.conv1(x)
 

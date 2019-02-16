@@ -16,6 +16,8 @@ class NkDataSet(Dataset):
     #초기화 시켜주는 작업
     def __init__(self, csv_path):
 
+        print(csv_path)
+
         self.to_tensor = transforms.ToTensor()
         self.data_info = pd.read_csv(csv_path,header=None)
         #asarray is convert the input to an array

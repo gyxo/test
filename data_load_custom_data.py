@@ -23,7 +23,6 @@ class NkDataSet(Dataset):
         self.label_arr = np.asarray(self.data_info.iloc[:,1])
         self.data_len = len(self.data_info.index)
 
-
     #경로를 통해서 실제 데이터의 접근을 해서 데이터를 돌려주는 함수
     # __getitem__
     def __getitem__(self, index):
@@ -57,8 +56,7 @@ my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
                                                 shuffle=False)
 
 
-
-
 #enumerate 는 list 의 있는 내용을 순서를 매기면서 프린트를 한다.
 for i, (images, labels) in enumerate(my_dataset_loader):
+
     print(images,labels)

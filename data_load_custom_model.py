@@ -11,7 +11,7 @@ from fc_model import NkModel
 from my_dataset import NkDataSet
 
 #Data Load
-csv_path = './file/animal_info.csv'
+csv_path = './file_test/data_load.csv'
 
 custom_dataset = NkDataSet(csv_path)
 
@@ -19,12 +19,14 @@ my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
                                                 batch_size=2,
                                                 shuffle=False,
                                                 num_workers=1)
+
+
 #Model Load
 #input , hidden, output size
 
 D_in = 30000 #(100 * 100 * 3)
 H = 1000
-D_out = 2
+D_out = 5
 
 model = NkModel(D_in, H, D_out)
 
