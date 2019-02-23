@@ -4,6 +4,7 @@
 CODE 설명
 Pytorch 에서 사용하는 dataset 의 형태에 맞게 Data를 만드는 작업
 '''
+
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 import pandas as pd
@@ -29,9 +30,14 @@ class NkDataSet(Dataset):
 
         single_image_name = self.image_arr[index]
 
+        print(single_image_name)
         img_as_img = cv2.imread(single_image_name)
 
+
+        img_as_img = cv2.resize(img_as_img,(100,100))
         img_as_tensor = self.to_tensor(img_as_img)
+
+
 
         single_image_label = self.label_arr[index]
 
@@ -46,7 +52,7 @@ class NkDataSet(Dataset):
 
 
 #cav 의 경로를 설정해 줘야 한다.
-csv_path = './file/animal_info.csv'
+csv_path = './file/test.csv'
 
 custom_dataset = NkDataSet(csv_path)
 

@@ -5,10 +5,11 @@ CODE 설명
 Pytorch 에서 custom 으로 생성한 데이터와 모델을 이용해서 실험을 돌림,
 DataLoader에서 batch_size 만큼 Data가 제공된다.
 '''
+
 from torch.utils.data.dataset import Dataset
 import torch
-from fc_model import NkModel
-from my_dataset import NkDataSet
+from cnn_underba_model import Cnn_Model
+from data_load_custom_data import NkDataSet
 
 #Data Load
 csv_path = './file_test/data_load.csv'
@@ -28,7 +29,7 @@ D_in = 30000 #(100 * 100 * 3)
 H = 1000
 D_out = 5
 
-model = NkModel(D_in, H, D_out)
+model = Cnn_Model(D_in, H, D_out)
 
 #CrossEntropyLoss 를 사용
 criterion = torch.nn.CrossEntropyLoss(reduction='sum')
