@@ -17,6 +17,7 @@ import torch
 class NkDataSet(Dataset):
 
     #초기화 시켜주는 작업
+
     def __init__(self, csv_path):
 
         self.to_tensor = transforms.ToTensor()
@@ -28,6 +29,7 @@ class NkDataSet(Dataset):
 
 
     #경로를 통해서 실제 데이터의 접근을 해서 데이터를 돌려주는 함수
+
     def __getitem__(self, index):
 
         single_image_name = self.image_arr[index]
@@ -35,6 +37,7 @@ class NkDataSet(Dataset):
         img_as_img = Image.open(single_image_name)
 
         #img size check
+
         img = img_as_img.resize((100, 100), Image.ANTIALIAS)
 
 
@@ -48,11 +51,14 @@ class NkDataSet(Dataset):
 
 
     #데이터의 전체 길이를 구하는 함수
+
     def __len__(self):
 
         return self.data_len
 
+
 #cav 의 경로를 설정해 줘야 한다.
+
 csv_path = './file/animal_info.csv'
 
 custom_dataset = NkDataSet(csv_path)
@@ -63,6 +69,9 @@ my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
                                                 batch_size=1,
                                                 shuffle=False)
 
+
 #enumerate 는 list 의 있는 내용을 순서를 매기면서 프린트를 한다.
+
 for i, (images, labels) in enumerate(my_dataset_loader):
+
     print(images,labels)

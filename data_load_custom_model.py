@@ -12,6 +12,7 @@ from cnn_underba_model import Cnn_Model
 from data_load_custom_data import NkDataSet
 
 #Data Load
+
 csv_path = './file_test/data_load.csv'
 
 custom_dataset = NkDataSet(csv_path)
@@ -32,12 +33,14 @@ D_out = 5
 model = Cnn_Model(D_in, H, D_out)
 
 #CrossEntropyLoss 를 사용
+
 criterion = torch.nn.CrossEntropyLoss(reduction='sum')
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-4)#1/10000
 
 for t in range(500):
 
     for i,data in enumerate(my_dataset_loader,0):
+
         # Forward pass: Compute predicted y by passing x to the model
 
         #fc 구조 이기 때문에 일렬로 쫙피는 작업이 필요하다.
@@ -46,18 +49,22 @@ for t in range(500):
 
         #그냥 images를 하면 에러가 난다. 데이터 shape이 일치하지 않아서
         # 100 , 100 , 3
+
         images = images.view(2,30000)
         print(images.size())
         print("label is label",label)
         y_pred = model(images)
 
         print(label)
+
         # Compute and print loss
+
         loss = criterion(y_pred,label)
 
         print(t, loss.item())
 
         # Zero gradients, perform a backward pass, and update the weights.
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

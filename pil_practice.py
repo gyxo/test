@@ -4,10 +4,13 @@ PIL를 연습하는 시간
 '''
 
 #opencv cv2, PIL
+
 from PIL import Image
+
 import numpy as np
 
 #Image Load
+
 img = Image.open("./data/cat.png")
 
 
@@ -15,6 +18,7 @@ img = Image.open("./data/cat.png")
 #im.save("cat_2.png")
 
 #Image size check
+
 print(img.size)
 
 #Image resize
@@ -30,4 +34,5 @@ print(img.size)
 
 
 #PIL 는 RGB format, Opencv BGR format 이다.
+
 print(type(img))

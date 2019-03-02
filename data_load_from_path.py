@@ -16,10 +16,12 @@ import torch
 
 
 #이미지의 종류들을 분류
+
 image_sort = ['png','jpg','jpeg']
 image_list = []
 
 #path 의 어떤 경로를 넣는냐에 따라 상대경로, 절대경로가 결정된다.
+
 path = ''
 
 
@@ -36,4 +38,5 @@ for filename in os.listdir(path):
 
 
 #for check
+
 print(image_list)

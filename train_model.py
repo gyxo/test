@@ -31,6 +31,7 @@ def train(my_dataset_loader, model, criterion, optimizer, epoch):
         print(epoch, loss.item())
 
         #Zero gradients, perform a backward pass, and updata the weights.
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
