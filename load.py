@@ -1,9 +1,31 @@
 # -*- coding: utf-8 -*-
+
 from torch.utils.data.dataset import Dataset
 import torch
 from cnn_underba_model import Cnn_Model
 from my_dataset import NkDataSet
 from tensorboardX import SummaryWriter
+import argparse
+import time
+import os
+
+parser = argparse.ArgumentParser(description="PyTorch Custom Training")
+parser.add_argument("--print_freq", "--p", default=2, type=int, metavar="N",
+                    help="number of data loading workers (default: 4)")
+
+
+parser.add_argument("--save--import torch.nn.init as initdir", dest="save_dir",
+                    help="The directory used to save the trained models",
+                    default="save_layer_load", type=str)
+
+
+args = parser.parse_args()
+
+
+def save_checkpoint(state, filename = "checkpoint.pth.bar"):
+
+    torch.save(state, filename)
+
 
 def accuarcy(output, target, topk = (1,)):
 
@@ -67,8 +89,8 @@ def train(my_dataset_loader, model, criterion, optimizer, epoch, writer):
 
         images, label = data
 
-        #images = torc.autograd.Variable(images)
-        #label = torch.autograd.Variable(label)
+        images = torch.autograd.Variable(images)
+        label = torch.autograd.Variable(label)
 
         #그냥 images를 하면 데이터 shape가 일치하지 않아서 에러가 난다.
 
@@ -112,6 +134,10 @@ def test(my_dataset_loader, model, criterion, epoch, test_writer):
     top1 = AverageMeter()
     model.eval()
 
+    batch_time = AverageMeter()
+    end = time.time()
+
+
     for i, data in enumerate(my_dataset_loader, 0):
 
         images, label = data
@@ -128,8 +154,24 @@ def test(my_dataset_loader, model, criterion, epoch, test_writer):
         losses.update(loss.item(), images.size(0))
         top1.update(prec1.item(), images.size(0))
 
+        batch_time.update(time.time() - end)
+        end = time.time()
+
+
+        if i % args.print_freq == 0:
+
+            print("Test : [{0}/{1}]\t"
+                  "time {batch_time.val:.3f} {batch_time.avg:.3f})\t"
+                  "Loss {loss.val:.3f} ({top1.avg:.3f})".format(
+                i,len(my_dataset_loader), batch_time=batch_time, loss=losses, top1=top1
+            ))
+
+
     print("* epoch : {epoch:.2f} prec@1 {top1.avg:.3f}"
           .format(epoch=epoch, top1=top1))
+
+    test_writer.add_scalar("test/loss", losses.avg, epoch)
+    test_writer.add_scalar("test/accuaracy", top1.avg, epoch)
 
 
 csv_path = "./file/data_load.csv"
@@ -139,7 +181,7 @@ custom_dataset = NkDataSet(csv_path)
 
 my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
                                                 batch_size=5,
-                                                shuffle=False,
+                                                shuffle=True,
                                                 num_workers=1)
 
 D_in = 30000
@@ -148,15 +190,22 @@ D_out = 2
 
 model = Cnn_Model()
 
+checkpoint = torch.load("save_dir/checkpoint_2.tar")
+model.load_state_dict(checkpoint["state_dict"])
+
 criterion = torch.nn.CrossEntropyLoss(reduction="sum")
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-4)
 
 writer = SummaryWriter("./log")
 test_writer = SummaryWriter("./log/test")
 
+args.save_dir = "save_dir"
 
 for epoch in range(500):
 
     train(my_dataset_loader, model, criterion, optimizer, epoch, writer)
     test(my_dataset_loader, model, criterion, epoch, test_writer)
 
+    save_checkpoint({"epoch": epoch + 1,
+                    "state_dict": model.state_dict(),
+                    }, filename=os.path.join(args.save_dir, "checkpoint_{}.tar".format(epoch)))
