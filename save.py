@@ -3,11 +3,15 @@
 from torch.utils.data.dataset import Dataset
 import torch
 from cnn_underba_model import Cnn_Model
+from CNN_model_2 import NkModel
+from fc_model_2 import FcModel
 from my_dataset import NkDataSet
 from tensorboardX import SummaryWriter
 import argparse
 import time
 import os
+import torchvision.transforms as transforms
+import torchvision.datasets as dataset
 
 parser = argparse.ArgumentParser(description="PyTorch Custom Training")
 parser.add_argument("--print_freq", "--p", default=2, type=int, metavar="N",
@@ -174,21 +178,26 @@ def test(my_dataset_loader, model, criterion, epoch, test_writer):
     test_writer.add_scalar("test/accuaracy", top1.avg, epoch)
 
 
-csv_path = "./file/data_load.csv"
 
-custom_dataset = NkDataSet(csv_path)
+root = '.'
 
 
-my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
-                                                batch_size=5,
-                                                shuffle=True,
-                                                num_workers=1)
+trans = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,),(1.0,))])
 
-D_in = 30000
-H = 100
-D_out = 2
+train_data = dataset.MNIST(root=root,train=True,transform=trans,download=True)
+test_data = dataset.MNIST(root=root,train=False,transform=trans,download=True)
 
-model = Cnn_Model()
+my_dataset_train = torch.utils.data.DataLoader(
+                    dataset=train_data,
+                    batch_size=100,
+                    shuffle=True)
+
+my_dataset_test = torch.utils.data.DataLoader(
+                    dataset=test_data,
+                    batch_size=100,
+                    shuffle=False)
+
+model = FcModel()
 
 criterion = torch.nn.CrossEntropyLoss(reduction="sum")
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-4)
@@ -200,8 +209,8 @@ args.save_dir = "save_dir"
 
 for epoch in range(500):
 
-    train(my_dataset_loader, model, criterion, optimizer, epoch, writer)
-    test(my_dataset_loader, model, criterion, epoch, test_writer)
+    train(my_dataset_train , model, criterion, optimizer, epoch, writer)
+    test(my_dataset_test, model, criterion, epoch, test_writer)
 
     save_checkpoint({"epoch": epoch + 1,
                     "state_dict": model.state_dict(),
