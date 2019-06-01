@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
 import set_variable
-
 #O=W+K+2PS+1
 batch_size = set_variable.batch_size
 class Regression_model(torch.nn.Module):

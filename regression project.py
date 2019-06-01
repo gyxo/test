@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from torch.utils.data.dataset import Dataset
 import torch
-from custom_model import CustomModel
+from regression_model import Regression_model
 from my_dataset import NkDataSet
 from tensorboardX import SummaryWriter
-import set_variable
 import argparse
+import set_variable
 import time
 import os
 import torchvision.datasets as mdatset
@@ -26,6 +26,14 @@ parser.add_argument('--save-import torch.nn.init as initdir',dest='save_dir',
 args = parser.parse_args()
 
 #save checkpoint
+
+def adjust_learning_rate(optimizer, epoch, lr):
+
+    lr = lr * (0.1 ** (epoch // 50))
+
+    for param_group in optimizer.param_groups:
+
+        param_group["lr"] = lr
 
 def save_checkpoint(state,filename='checkpoint.pth.bar'):
     torch.save(state,filename)
@@ -109,30 +117,57 @@ def test(my_dataset_loader, model, criterion, epoch, test_writer):
 
     test_writer.add_scalar('Test/loss', losses.avg, epoch)
 
+    return losses.avg
+
 #Data_Load
-csv_path = './file/hero.csv'
+csv_path = './file/train.csv'
 custom_dataset = NkDataSet(csv_path)
 my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=set_variable.batch_size,
                                                 shuffle=True, num_workers=1)
 
 
-csv_path = './file/hero_2.csv'
+csv_path = './file/test.csv'
 custom_dataset = NkDataSet(csv_path)
-hero_2_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=set_variable.batch_size,
+my_dataset_loader = torch.utils.data.DataLoader(dataset=custom_dataset, batch_size=set_variable.batch_size,
                                                 shuffle=True, num_workers=1)
 
 model = Regression_model()
 print(model)
 #Regression 이기 때문에 loss가 변경 되어야 한다.
 criterion = torch.nn.MSELoss(reduction="sum")
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-1)
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 writer = SummaryWriter('./log')
 test_writer = SummaryWriter('./log/test')
 
-for epoch in range(500):
-    train(my_dataset_loader, model, criterion, optimizer, epoch, writer)
-    test(hero_2_dataset_loader, model, criterion, epoch, test_writer)
+best_prec = 0
 
-    save_checkpoint({"epoch": epoch + 1,
-                     "state_dict": model.state_dict()
-                     }, filename=os.path.join("./save_dir", "checkpoin_{}.tar".format(epoch)))
+save_dir = './save_dir'
+lr = 1e-3
+
+for epoch in range(500):
+
+    adjust_learning_rate(optimizer,epoch,lr)
+
+    train(my_dataset_loader, model, criterion, optimizer, epoch, writer)
+
+    if(epoch == 0):
+
+        prec = test(my_dataset_loader, model, criterion, epoch, test_writer)
+        best_prec = prec
+
+    else:
+        prec = test(my_dataset_loader,model,criterion,epoch,test_writer)
+
+    if(prec < best_prec):
+
+        best_epoch = epoch
+        best_prec = prec
+        save_checkpoint({
+            "epoch":epoch + 1,
+            "state_dict":model.state_dict(),
+            "best_prec1":best_prec,
+            "best_epoch":best_epoch
+        }, filename=os.path.join(save_dir,"checkpoint_{}.tar".format(epoch)))
+
+
+
